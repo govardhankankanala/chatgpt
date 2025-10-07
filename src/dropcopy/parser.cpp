@@ -5,22 +5,21 @@ namespace dropcopy {
 
 static FrameHeader read_header(ByteReader& rd) {
   FrameHeader h{};
-  // === AUTO-UPDATE: HEADER DECODE START ===
-  // Length + opcode (little-endian). Adjust per circulars if needed.
   h.length = rd.read_u16();
   h.opcode = static_cast<OpCode>(rd.read_u16());
-  // Optional fields (sequence, timestamp). Keep zero if not present.
-  // (Automation may replace this block entirely.)
-  // === AUTO-UPDATE: HEADER DECODE END ===
+  h.seq = rd.read_u32();
+  h.ts = rd.read_u64();
   return h;
 }
 
-// Placeholder decoders; automation will expand fields per circulars.
 static TradeMsg decode_trade(ByteReader& rd) {
   TradeMsg t{};
-  t.symbol = rd.read_padded_string(16, '\0'); // 16-byte sym
+  t.symbol = rd.read_padded_string(16, '\0');
   t.qty = static_cast<std::int32_t>(rd.read_u32());
   t.price_nanos = static_cast<std::int64_t>(rd.read_u64());
+  t.broker_id = rd.read_padded_string(5, '\0');
+  t.account_number = rd.read_padded_string(10, '\0');
+  t.settlor = rd.read_padded_string(12, '\0');
   return t;
 }
 
@@ -30,12 +29,14 @@ static OrderMsg decode_order(ByteReader& rd) {
   o.order_id = static_cast<std::int64_t>(rd.read_u64());
   o.remaining_qty = static_cast<std::int32_t>(rd.read_u32());
   o.state = rd.read_u8();
+  o.account_number = rd.read_padded_string(10, '\0');
+  o.settlor = rd.read_padded_string(12, '\0');
   return o;
 }
 
 std::optional<Message> parse_one(const std::uint8_t* buf, std::size_t len, std::size_t& consumed) {
   consumed = 0;
-  if (len < 4) return std::nullopt; // need at least length+opcode
+  if (len < 4) return std::nullopt;
   ByteReader rd(buf, buf + len);
 
   const auto frame_len = [&]() {
@@ -44,7 +45,6 @@ std::optional<Message> parse_one(const std::uint8_t* buf, std::size_t len, std::
     return static_cast<std::size_t>(L);
   }();
 
-  // Protect against inconsistent/short frames.
   if (frame_len == 0 || frame_len > len) return std::nullopt;
 
   ByteReader fr(buf, buf + frame_len);
@@ -64,14 +64,12 @@ std::optional<Message> parse_one(const std::uint8_t* buf, std::size_t len, std::
       break;
     }
     default: {
-      // Unknown opcode; consume frame but ignore payload.
       fr.read_bytes(fr.remaining());
-      msg.payload = OrderMsg{}; // benign placeholder
+      msg.payload = OrderMsg{};
       break;
     }
   }
 
-  // Consume exactly this frame.
   consumed = frame_len;
   return msg;
 }
