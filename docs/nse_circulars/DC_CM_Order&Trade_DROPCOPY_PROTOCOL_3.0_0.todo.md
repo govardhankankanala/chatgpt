@@ -1,16 +1,16 @@
-# Implementation Checklist for NSE Protocol for Drop Copy Service - Capital Markets Segment
+# Implementation Checklist for NSE Circular: Protocol for Drop Copy Service - Capital Markets Segment
 
-- [ ] Review the new Drop Copy Service protocol document version 3.0.
-- [ ] Update the system to support the new Trade Only and Order & Trade Drop Copy API.
-- [ ] Implement optimized message structures as per the new protocol.
-- [ ] Enhance connection mechanisms to support multiple partitions.
+- [ ] Review and understand the new Drop Copy Protocol Version 3.0 document.
+- [ ] Update system to support new Trade Only and Order & Trade Drop Copy APIs.
 - [ ] Implement encryption and compression as per the new protocol.
-- [ ] Test the entire Drop Copy Service system with the new protocol.
+- [ ] Ensure backward compatibility with previous protocol versions.
+- [ ] Update documentation to reflect changes in the Drop Copy Service.
 
 ## Acceptance Criteria
-- Document is reviewed and understood by the team.
-- System supports the new API as per the protocol document.
-- Message structures are optimized and tested.
-- System can connect to multiple partitions as specified.
-- Encryption and compression are implemented and verified.
-- System passes all tests with the new protocol implementation.
+- Document reviewed and key changes identified.
+- System updated to handle new API endpoints.
+- APIs tested for correct data dissemination.
+- TLS 1.3 and AES-256 encryption implemented.
+- LZO compression integrated and tested.
+- System supports both old and new protocol versions without issues.
+- Documentation updated with new protocol details and usage instructions.

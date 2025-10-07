@@ -5,16 +5,19 @@ namespace dropcopy {
 
 static FrameHeader read_header(ByteReader& rd) {
   FrameHeader h{};
+  // === AUTO-UPDATE: HEADER DECODE START ===
   h.length = rd.read_u16();
   h.opcode = static_cast<OpCode>(rd.read_u16());
   h.seq = rd.read_u32();
   h.ts = rd.read_u64();
+  // === AUTO-UPDATE: HEADER DECODE END ===
   return h;
 }
 
 static TradeMsg decode_trade(ByteReader& rd) {
   TradeMsg t{};
   t.symbol = rd.read_padded_string(16, '\0');
+  t.order_number = rd.read_u64();
   t.qty = static_cast<std::int32_t>(rd.read_u32());
   t.price_nanos = static_cast<std::int64_t>(rd.read_u64());
   t.broker_id = rd.read_padded_string(5, '\0');
@@ -26,7 +29,7 @@ static TradeMsg decode_trade(ByteReader& rd) {
 static OrderMsg decode_order(ByteReader& rd) {
   OrderMsg o{};
   o.symbol = rd.read_padded_string(16, '\0');
-  o.order_id = static_cast<std::int64_t>(rd.read_u64());
+  o.order_id = rd.read_u64();
   o.remaining_qty = static_cast<std::int32_t>(rd.read_u32());
   o.state = rd.read_u8();
   o.account_number = rd.read_padded_string(10, '\0');
