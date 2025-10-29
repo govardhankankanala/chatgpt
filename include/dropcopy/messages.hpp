@@ -13,13 +13,16 @@ struct FrameHeader {
   OpCode        opcode;   // message type
   std::uint32_t seq = 0;  // sequence number
   std::uint64_t ts  = 0;  // timestamp in nanoseconds
+
 };
 // === AUTO-UPDATE: HEADER END ===
 
 // === AUTO-UPDATE: MESSAGES START ===
 struct TradeMsg {
   std::string   symbol;
+  nse-circ/drop-copy-protocol-v3
   std::int64_t  order_number = 0;
+
   std::int32_t  qty = 0;
   std::int64_t  price_nanos = 0;
   std::string   broker_id;
